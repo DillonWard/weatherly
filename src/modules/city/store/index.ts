@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import citiesData from 'cities.json' 
+import citiesData from 'cities.json'
 import { getWeatherReport } from '@/modules/weather/services'
 
 const cities: City[] = (citiesData as CityJson[]).map(c => ({
@@ -28,15 +28,21 @@ export const useCityStore = defineStore('city', {
         getCity: (state) => state.city
     },
 
-    actions:{
+    actions: {
         searchCity(query: string): City[] {
-            if(!query || query.trim().length < 3) return []
+            if (!query || query.trim().length < 3) return []
             return this.cities.filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
         },
-        selectCity(city: City){
+        async selectCity(city: City): Promise<void> {
             this.city = city
-            getWeatherReport(city.lat, city.lng)
+            await getWeatherReport(city.lat, city.lng)
+        },
+        unsetCity(): void {
+            this.city = null
         }
+    },
+    persist: {
+        pick: ['city']
     }
 })
 
@@ -48,7 +54,7 @@ interface CityJson {
     country: string
 }
 
-export interface City{
+export interface City {
     name: string
     lat: number
     lng: number

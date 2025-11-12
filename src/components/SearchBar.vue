@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 const cityStore = useCityStore()
 const city = computed(() => cityStore.city)
 
-const searchQuery = ref('')
+const searchQuery = ref(city.value ? `${city.value.name}, ${city.value.country}` : '')
 
 const router = useRouter()
 
