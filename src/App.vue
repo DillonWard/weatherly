@@ -9,7 +9,10 @@ import Header from './components/Header.vue';
       <Header />
     </div>
     <div class="h-[calc(100vh-50px)]">
+      <div class="pt-10">
       <RouterView></RouterView>
+
+      </div>
 
     </div>
   </div>
