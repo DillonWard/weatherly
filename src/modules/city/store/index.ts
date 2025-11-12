@@ -31,7 +31,6 @@ export const useCityStore = defineStore('city', {
     actions:{
         searchCity(query: string): City[] {
             if(!query || query.trim().length < 3) return []
-            console.log(this.cities.filter(c => c.name.toLowerCase().includes(query.toLowerCase())));
             return this.cities.filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
         },
         selectCity(city: City){

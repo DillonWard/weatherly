@@ -1,18 +1,30 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCityStore, City } from './store';
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
+const city = route.params["name"]
 
 const cityStore = useCityStore()
-const searchQUery = ref('')
+const hasSeached = computed(() => cityStore.city !== null)
 
-const city = route.params["name"]
+
+onMounted(() => {
+    if(hasSeached.value == false)
+        setTimeout(() => {
+    router.push({name: 'home'})            
+        }, 2000);
+})
 
 </script>
 
 <template>
-    {{ city }}
+    <div v-if="!hasSeached">
+        <p>
+            You have not selected a city. Being redirected to home.
+        </p>
+    </div>
 
 </template>
