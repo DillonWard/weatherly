@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useCityStore, City } from '@/modules/city/store'
-import { useSearchStore, Search } from '@/modules/search/store';
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const cityStore = useCityStore()
 const city = computed(() => cityStore.city)
@@ -60,7 +59,6 @@ onBeforeUnmount(() => {
 
 <template>
     <div>
-        {{ JSON.stringify(searchQuery) }}
         <input v-model="searchQuery" ref="inputRef" @focus="checkIfQuery()"
             class="bg-white rounded-sm text-lg px-2 focus:outline-none border border-gray-300 w-full"
             placeholder="Search city..." />

@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import citiesData from 'cities.json' 
+import { getWeatherReport } from '@/modules/weather/services'
 
-
-const cities: City[] = (citiesData as City[]).map(c => ({
+const cities: City[] = (citiesData as CityJson[]).map(c => ({
     name: c.name,
-    lat: c.lat,
-    lng: c.lng,
+    lat: parseFloat(c.lat),
+    lng: parseFloat(c.lng),
     country: c.country
 }))
 
@@ -35,16 +35,22 @@ export const useCityStore = defineStore('city', {
         },
         selectCity(city: City){
             this.city = city
+            getWeatherReport(city.lat, city.lng)
         }
     }
-
 })
 
 
-
-export interface City{
+interface CityJson {
     name: string
     lat: string
     lng: string
+    country: string
+}
+
+export interface City{
+    name: string
+    lat: number
+    lng: number
     country: string
 }

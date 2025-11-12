@@ -24,6 +24,9 @@ export const useSearchStore = defineStore('search', {
                 city,
                 timestamp: new Date()
             })
+        },
+        toggleIsLoading(){
+            this.isLoading = !this.isLoading
         }
     }
 })
