@@ -1,31 +1,24 @@
 import { fetchWeatherApi } from "openmeteo";
-import { useSearchStore } from "@/modules/search/store";
-
+import { City } from "@/modules/city/store";
+import { useWeatherStore } from "../store";
 
 const url = "https://api.open-meteo.com/v1/forecast";
 
-export async function getWeatherReport(latitude: number, longitude: number) {
-    const searchStore = useSearchStore()
+export async function getWeatherReport(city: City) : Promise<void> {
+    const weatherStore = useWeatherStore()
 
-    searchStore.toggleIsLoading()
+    weatherStore.toggleIsLoading()
 
     const params = {
-        latitude,
-        longitude,
+        latitude: city.lat,
+        longitude: city.lng,
         hourly: "temperature_2m"
     }
 
     const responses = await fetchWeatherApi(url, params)
     const response = responses[0]
 
-    const elevation = response.elevation();
     const utcOffsetSeconds = response.utcOffsetSeconds();
-
-    console.log(
-        `\nCoordinates: ${latitude}°N ${longitude}°E`,
-        `\nElevation: ${elevation}m asl`,
-        `\nTimezone difference to GMT+0: ${utcOffsetSeconds}s`,
-    );
 
     const hourly = response.hourly()!;
 
@@ -39,8 +32,21 @@ export async function getWeatherReport(latitude: number, longitude: number) {
         },
     };
 
-    console.log("\nHourly data:\n", weatherData.hourly)
-    searchStore.toggleIsLoading()
+    const now = Date.now()
+
+    const index = weatherData.hourly.time.reduce((closestIdx, curr, idx, arr) => {
+        const currTime = new Date(curr).getTime()
+        const closestTime = new Date(arr[closestIdx]).getTime()
+        return Math.abs(currTime - now) < Math.abs(closestTime - now) ? idx : closestIdx
+    }, 0)
+
+
+    weatherStore.setWeatherReport({
+        city: city,
+        temperature: Math.round(weatherData.hourly.temperature_2m[index])
+    })
+
+    weatherStore.toggleIsLoading()
 
 
 }

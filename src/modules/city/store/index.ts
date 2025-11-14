@@ -12,20 +12,18 @@ const cities: City[] = (citiesData as CityJson[]).map(c => ({
 interface State {
     city: City | null
     cities: City[]
-    isLoading: boolean
 }
 
 export const useCityStore = defineStore('city', {
     state: (): State => {
         return {
-            city: null,
-            cities,
-            isLoading: false
+            city: null as City | null,
+            cities: cities as City[],
         }
     },
 
     getters: {
-        getCity: (state) => state.city
+        getCity: (state): City | null => state.city
     },
 
     actions: {
@@ -33,13 +31,11 @@ export const useCityStore = defineStore('city', {
             if (!query || query.trim().length < 3) return []
             return this.cities.filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
         },
-        async selectCity(city: City): Promise<void> {
+        async selectCity(city: City | null): Promise<void> {
             this.city = city
-            await getWeatherReport(city.lat, city.lng)
+            if(city !== null)
+                await getWeatherReport(city)
         },
-        unsetCity(): void {
-            this.city = null
-        }
     },
     persist: {
         pick: ['city']
@@ -53,6 +49,7 @@ interface CityJson {
     lng: string
     country: string
 }
+
 
 export interface City {
     name: string

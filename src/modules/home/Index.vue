@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { onBeforeMount } from 'vue'
 import SearchBar from '@/components/SearchBar.vue'
-import { useCityStore, City } from '@/modules/city/store'
+import WeatherReportHistory from './components/WeatherReportHistory.vue'
+import { useCityStore } from '@/modules/city/store'
 
 const cityStore = useCityStore()
 
-const city = computed(()=> cityStore.city)
+onBeforeMount(() =>  cityStore.selectCity(null))
 
 </script>
 
@@ -16,9 +17,11 @@ const city = computed(()=> cityStore.city)
         <div class="flex justify-center">
           <div class="relative w-[300px]">
             <SearchBar />
-            {{ city }}
           </div>
         </div>
+      </div>
+      <div>
+        <WeatherReportHistory />
       </div>
     </div>
 
