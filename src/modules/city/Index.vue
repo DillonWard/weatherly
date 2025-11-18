@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useCityStore } from './store';
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useWeatherStore } from '../weather/store';
 
 const router = useRouter()
+const route = useRoute()
+
+const { country, city } = route.params
 
 const cityStore = useCityStore()
 const weatherStore = useWeatherStore()

@@ -31,10 +31,17 @@ export const useCityStore = defineStore('city', {
             if (!query || query.trim().length < 3) return []
             return this.cities.filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
         },
+        getCityFromParams(cityParam: string, countryParam: string): boolean {
+            const cityName = cityParam.toLowerCase()
+            const countryName = countryParam.toLowerCase()
+            if (!this.city || this.city.name.toLowerCase() !== cityName || this.city.country.toLowerCase() !== countryName) {
+                this.city = this.cities.find(c => c.name.toLowerCase() === cityName && c.country.toLowerCase() === countryName) || null
+                return true
+            }
+            return false
+        },
         async selectCity(city: City | null): Promise<void> {
             this.city = city
-            if(city !== null)
-                await getWeatherReport(city)
         },
     },
     persist: {

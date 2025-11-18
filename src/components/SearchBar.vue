@@ -11,20 +11,25 @@ const searchQuery = ref(city.value ? `${city.value.name}, ${city.value.country}`
 const router = useRouter()
 
 const showResults = ref(false)
-const results = computed(() => cityStore.searchCity(searchQuery.value))
+const results = computed(() => cityStore.searchCity(searchQuery.value.replace(/[^a-zA-Z ]/g, "")))
 
 const inputRef = ref<HTMLElement | null>(null)
 const resultsRef = ref<HTMLElement | null>(null)
 
-function selectCity(city: City) {
+function selectCity(city: City): void {
     cityStore.selectCity(city)
     showResults.value = false
     searchQuery.value = `${city.name}, ${city.country}`
-    router.push({ name: 'city', params: { name: city.name } })
-
+    router.push({
+        name: 'city',
+        params: {
+            country: city.country.toLowerCase().replace(/\s+/g, "_"),
+            city: city.name.toLowerCase().replace(/\s+/g, "_")
+        }
+    })
 }
 
-function checkIfQuery() {
+function checkIfQuery(): void {
     if (searchQuery.value.length >= 3 && results.value.length > 0) {
         showResults.value = true
     }
