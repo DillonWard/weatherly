@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useCityStore, City } from '@/modules/city/store'
 import { useRouter } from 'vue-router'
-import { useQueryHandler } from '@/composables/query.ts'
+import { useQueryHandler } from '@/composables/query'
 
 const { formatQuery } = useQueryHandler()
 
@@ -20,10 +20,10 @@ const inputRef = ref<HTMLElement | null>(null)
 const resultsRef = ref<HTMLElement | null>(null)
 
 function selectCity(city: City): void {
+    showResults.value = false
+    console.log(showResults.value);
     searchQuery.value = `${city.name}, ${city.country}`
 
-    cityStore.selectCity(city)
-    showResults.value = false
     router.push({
         name: 'city',
         params: {
@@ -31,6 +31,8 @@ function selectCity(city: City): void {
             city: formatQuery(city.name, true)
         }
     })
+    cityStore.selectCity(city)
+
 }
 
 function checkIfQuery(): void {
@@ -39,7 +41,7 @@ function checkIfQuery(): void {
     }
 }
 
-function handlePointerDownOutside(event: PointerEvent) {
+function handlePointerDownOutside(event: MouseEvent) {
     const path = (event.composedPath && event.composedPath()) || (event as any).path
     const target = event.target as Node
 
@@ -51,23 +53,25 @@ function handlePointerDownOutside(event: PointerEvent) {
     }
 }
 
-watch(results, (after) => {
-    showResults.value = after.length > 0 ? true : false
-})
-
 watch(city, (newCity) => {
   searchQuery.value = newCity ? `${newCity.name}, ${newCity.country}` : ''
 }, { immediate: true })
 
+watch(searchQuery, (newQuery) => {
+  if (newQuery.length >= 3 && results.value.length > 0) {
+    showResults.value = true
+  } else {
+    showResults.value = false
+  }
+})
 
 onMounted(() => {
-    document.addEventListener('pointerdown', handlePointerDownOutside, { capture: true })
+  document.addEventListener('click', handlePointerDownOutside)
 })
 
 onBeforeUnmount(() => {
-    document.removeEventListener('pointerdown', handlePointerDownOutside, { capture: true })
+  document.removeEventListener('click', handlePointerDownOutside)
 })
-
 
 </script>
 
@@ -78,11 +82,10 @@ onBeforeUnmount(() => {
             placeholder="Search city..." />
         <ul v-if="showResults" ref="resultsRef"
             class="absolute bg-white shadow-md mt-1 w-full max-h-60 overflow-auto border border-gray-300 rounded-sm z-10">
-            <li v-for="(c, index) in results" :key="index" @click="selectCity(c)"
+            <li v-for="(c, index) in results" :key="index" @pointerdown="selectCity(c)"
                 class="p-2 hover:bg-gray-200 cursor-pointer text-lg">
                 {{ c.name }}, {{ c.country }}
             </li>
         </ul>
-
     </div>
 </template>
