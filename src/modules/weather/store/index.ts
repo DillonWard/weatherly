@@ -26,9 +26,12 @@ export const useWeatherStore = defineStore('weather', {
                 (i) => i.city.name === weatherReport.city.name &&
                 i.city.country === weatherReport.city.country
             )
-            if(index >= 0){
+            if(index >= 0)
                 this.weatherReportHistory.splice(index, 1)
-            }
+            
+            if(this.weatherReportHistory.length >= 3)
+                this.weatherReportHistory.pop()
+
             this.weatherReportHistory.unshift(weatherReport)
         },
         setWeatherReport(weatherReport : WeatherData): void {

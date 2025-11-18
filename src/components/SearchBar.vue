@@ -2,6 +2,9 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useCityStore, City } from '@/modules/city/store'
 import { useRouter } from 'vue-router'
+import { useQueryHandler } from '@/composables/query.ts'
+
+const { formatQuery } = useQueryHandler()
 
 const cityStore = useCityStore()
 const city = computed(() => cityStore.city)
@@ -17,14 +20,15 @@ const inputRef = ref<HTMLElement | null>(null)
 const resultsRef = ref<HTMLElement | null>(null)
 
 function selectCity(city: City): void {
+    searchQuery.value = `${city.name}, ${city.country}`
+
     cityStore.selectCity(city)
     showResults.value = false
-    searchQuery.value = `${city.name}, ${city.country}`
     router.push({
         name: 'city',
         params: {
-            country: city.country.toLowerCase().replace(/\s+/g, "_"),
-            city: city.name.toLowerCase().replace(/\s+/g, "_")
+            country: formatQuery(city.country, true),
+            city: formatQuery(city.name, true)
         }
     })
 }
@@ -50,6 +54,11 @@ function handlePointerDownOutside(event: PointerEvent) {
 watch(results, (after) => {
     showResults.value = after.length > 0 ? true : false
 })
+
+watch(city, (newCity) => {
+  searchQuery.value = newCity ? `${newCity.name}, ${newCity.country}` : ''
+}, { immediate: true })
+
 
 onMounted(() => {
     document.addEventListener('pointerdown', handlePointerDownOutside, { capture: true })

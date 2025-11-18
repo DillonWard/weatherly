@@ -40,7 +40,10 @@ export const useCityStore = defineStore('city', {
             }
             return false
         },
-        async selectCity(city: City | null): Promise<void> {
+        getSetCity(city: string, country: string): void{
+            this.city = this.cities.find(c => c.name.toLowerCase() === city && c.country.toLowerCase() === country) || null
+        },
+        selectCity(city: City | null): void {
             this.city = city
         },
     },

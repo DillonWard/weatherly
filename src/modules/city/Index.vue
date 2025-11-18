@@ -1,48 +1,51 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useCityStore } from './store';
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useWeatherStore } from '../weather/store';
+import { getWeatherReport } from '@/modules/weather/services'
+import { useQueryHandler } from '@/composables/query'
 
-const router = useRouter()
 const route = useRoute()
-
-const { country, city } = route.params
+const { paramToString, formatQuery } = useQueryHandler()
 
 const cityStore = useCityStore()
 const weatherStore = useWeatherStore()
 
-const hasSeached = computed(() => cityStore.city !== null)
-
 const report = computed(() => weatherStore.weatherReport)
 const isLoading = computed(() => weatherStore.isLoading)
 
+async function fetchWeatherForRoute() {
+    const cityParam = formatQuery(paramToString(route.params.city))
+    const countryParam = formatQuery(paramToString(route.params.country))
+
+    const changed = cityStore.getCityFromParams(cityParam, countryParam)
+    if (changed || !cityStore.city) {
+        cityStore.getSetCity(cityParam, countryParam)
+        await getWeatherReport(cityStore.city)
+    }
+    else {
+        await getWeatherReport(cityStore.city)
+    }
+}
+
+watch(() => [route.params.city, route.params.country], () => {
+    fetchWeatherForRoute()
+}, { immediate: true })
 
 onMounted(() => {
-    if(hasSeached.value == false)
-        setTimeout(() => {
-    router.push({name: 'home'})            
-        }, 2000);
+    fetchWeatherForRoute()
 })
 
 </script>
 
 <template>
-    <div v-if="!hasSeached">
-        <p>
-            You have not selected a city. Being redirected to home.
-        </p>
-    </div>
-    
-    <div v-else>
-        <div v-if="isLoading"
-        >
+    <div v-if="isLoading || !report">
         Is loading...
-        </div>
-        <div v-else>
-            {{ report.city.name }} - {{ report.temperature }}°C
-        </div>
-
     </div>
+    <div v-else>
+        {{ report.city.name }} - {{ report.temperature }}°C
+    </div>
+
 
 </template>

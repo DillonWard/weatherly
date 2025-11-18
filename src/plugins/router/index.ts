@@ -10,28 +10,4 @@ const router = createRouter({
     routes
 })
 
-function paramToString(param: string | string[] | undefined): string {
-    return Array.isArray(param) ? param[0] : param ?? ''
-}
-
-router.beforeEach(async (to, from, next) => {
-    const cityStore = useCityStore()
-
-    const city = computed(() => cityStore.getCity)
-
-    if (to.name === "city") {
-        const cityParam = paramToString(to.params.city)
-        const countryParam = paramToString(to.params.country)
-
-        const changed = cityStore.getCityFromParams(cityParam, countryParam)
-        if (changed && cityStore.city) {
-            await getWeatherReport(cityStore.city)
-        }
-        else {
-            await getWeatherReport(city.value!)
-        }
-    }
-        next()
-
-})
 export default router
