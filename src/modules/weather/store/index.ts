@@ -1,5 +1,6 @@
 import { City } from "@/modules/city/store";
 import { defineStore } from "pinia";
+import { getWeatherReport } from "../services";
 
 interface State {
     weatherReport: WeatherData | null
@@ -33,6 +34,12 @@ export const useWeatherStore = defineStore('weather', {
                 this.weatherReportHistory.pop()
 
             this.weatherReportHistory.unshift(weatherReport)
+        },
+        async fetchWeatherReport(city: City): Promise<void> {
+            this.isLoading = true
+            const report = await getWeatherReport(city)
+            this.setWeatherReport(report)
+            this.isLoading = false
         },
         setWeatherReport(weatherReport : WeatherData): void {
             this.weatherReport = weatherReport

@@ -1,13 +1,10 @@
 import { fetchWeatherApi } from "openmeteo";
 import { City } from "@/modules/city/store";
-import { useWeatherStore } from "../store";
+import { useWeatherStore, WeatherData } from "../store";
 
 const url = "https://api.open-meteo.com/v1/forecast";
 
-export async function getWeatherReport(city: City) : Promise<void> {
-    const weatherStore = useWeatherStore()
-
-    weatherStore.toggleIsLoading()
+export async function getWeatherReport(city: City) : Promise<WeatherData | null> {
 
     const params = {
         latitude: city.lat,
@@ -41,12 +38,11 @@ export async function getWeatherReport(city: City) : Promise<void> {
     }, 0)
 
 
-    weatherStore.setWeatherReport({
+    return {
         city: city,
         temperature: Math.round(weatherData.hourly.temperature_2m[index])
-    })
+    }
 
-    weatherStore.toggleIsLoading()
 
 
 }

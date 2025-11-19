@@ -21,7 +21,6 @@ const resultsRef = ref<HTMLElement | null>(null)
 
 function selectCity(city: City): void {
     showResults.value = false
-    console.log(showResults.value);
     searchQuery.value = `${city.name}, ${city.country}`
 
     router.push({

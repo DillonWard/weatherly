@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import citiesData from 'cities.json'
-import { getWeatherReport } from '@/modules/weather/services'
 
 const cities: City[] = (citiesData as CityJson[]).map(c => ({
     name: c.name,
